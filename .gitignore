@@ -58,3 +58,6 @@ target/
 
 # Vagrant box
 .vagrant
+
+# Secret Keys
+client_secrets.json
