@@ -5,7 +5,17 @@
 		</a>
 	</div>
 	<div class="col-md-6 text-right">
-					<p>Login Link will go Here </p>
-		
+		<div id="signinButton">
+			<span class="g-signin"
+			data-scope="openid email"
+			data-clientid="1056302594964-686rca767vcb2p5eakt6tf6mlkvnqn7e.apps.googleusercontent.com"
+			data-redirecturi="postmessage"
+			data-accesstype="offline"
+			data-cookiepolicy="single_host_origin"
+			data-callback="signInCallback"
+			data-approvalprompt="force">
+		</span>
+	</div>
+	{{ login_session }}
 	</div>
 </div>

@@ -61,7 +61,7 @@ def gconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
-# Check that the access token is valid.
+    # Check that the access token is valid.
     access_token = credentials.access_token
     url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
            % access_token)
@@ -112,6 +112,12 @@ def gconnect():
     login_session['email'] = data['email']
 
     # See if a user exists, if it doesn't make a new one
+    login_session['user_id'] = getUserID(login_session['email']);
+
+    if login_session['user_id'] is None:
+        login_session['user_id'] = createUser(login_session);
+
+
     output = ''
     output += '<h1>Welcome, '
     output += login_session['username']
@@ -175,7 +181,7 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     else:
-        print 'no'
+        print result
         # For whatever reason, the given token was invalid.
         response = make_response(
             json.dumps('Failed to revoke token for given user.', 400))
@@ -184,7 +190,7 @@ def gdisconnect():
 
 
 # JSON APIs to view Restaurant Information
-@app.route('/restaurant/<int:restaurant_id>/menu/JSON')
+@app.route('/restaurants/<int:restaurant_id>/menu/JSON')
 def restaurantMenuJSON(restaurant_id):
     # restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
     items = session.query(MenuItem).filter_by(
@@ -192,13 +198,13 @@ def restaurantMenuJSON(restaurant_id):
     return jsonify(MenuItems=[i.serialize for i in items])
 
 
-@app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/JSON')
+@app.route('/restaurants/<int:restaurant_id>/menu/<int:menu_id>/JSON')
 def menuItemJSON(restaurant_id, menu_id):
     Menu_Item = session.query(MenuItem).filter_by(id=menu_id).one()
     return jsonify(Menu_Item=Menu_Item.serialize)
 
 
-@app.route('/restaurant/JSON')
+@app.route('/restaurants/JSON')
 def restaurantsJSON():
     restaurants = session.query(Restaurant).all()
     return jsonify(restaurants=[r.serialize for r in restaurants])
@@ -206,14 +212,17 @@ def restaurantsJSON():
 
 # Show all restaurants
 @app.route('/')
-@app.route('/restaurant/')
+@app.route('/restaurants/')
 def showRestaurants():
     restaurants = session.query(Restaurant).order_by(asc(Restaurant.name))
-    return render_template('restaurants.html', restaurants=restaurants)
+    if 'username' not in login_session:
+        return render_template('publicrestaurants.html', restaurants=restaurants)
+    else:
+        return render_template('restaurants.html', restaurants=restaurants)
 
 
 # Create a new restaurant
-@app.route('/restaurant/new/', methods=['GET', 'POST'])
+@app.route('/restaurants/new/', methods=['GET', 'POST'])
 def newRestaurant():
     if 'username' not in login_session:
         return redirect('/login')
@@ -229,12 +238,11 @@ def newRestaurant():
 
 
 # Edit a restaurant
-@app.route('/restaurant/<int:restaurant_id>/edit/', methods=['GET', 'POST'])
+@app.route('/restaurants/<int:restaurant_id>/edit/', methods=['GET', 'POST'])
 def editRestaurant(restaurant_id):
+    editedRestaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
     if 'username' not in login_session:
         return redirect('/login')
-        editedRestaurant = session.query(
-            Restaurant).filter_by(id=restaurant_id).one()
     if request.method == 'POST':
         if request.form['name']:
             editedRestaurant.name = request.form['name']
@@ -245,7 +253,7 @@ def editRestaurant(restaurant_id):
 
 
 # Delete a restaurant
-@app.route('/restaurant/<int:restaurant_id>/delete/', methods=['GET', 'POST'])
+@app.route('/restaurants/<int:restaurant_id>/delete/', methods=['GET', 'POST'])
 def deleteRestaurant(restaurant_id):
     if 'username' not in login_session:
         return redirect('/login')
@@ -261,17 +269,27 @@ def deleteRestaurant(restaurant_id):
 
 
 # Show a restaurant menu
-@app.route('/restaurant/<int:restaurant_id>/')
-@app.route('/restaurant/<int:restaurant_id>/menu/')
+@app.route('/restaurants/<int:restaurant_id>/')
+@app.route('/restaurants/<int:restaurant_id>/menu/')
 def showMenu(restaurant_id):
     restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
-    items = session.query(MenuItem).filter_by(
-        restaurant_id=restaurant_id).all()
-    return render_template('menu.html', items=items, restaurant=restaurant)
+    items = session.query(MenuItem).filter_by(restaurant_id=restaurant_id).all()
+    creator = getUserInfo(restaurant.user_id)
+
+    if 'username' not in login_session or creator.id != login_session['user_id']:
+        return render_template('publicmenu.html',
+                                items=items,
+                                restaurant=restaurant,
+                                creator= creator)
+    else:
+        return render_template('menu.html',
+                                items=items,
+                                restaurant=restaurant,
+                                creator= creator)
 
 
 # Create a new menu item
-@app.route('/restaurant/<int:restaurant_id>/menu/new/', methods=['GET', 'POST'])
+@app.route('/restaurants/<int:restaurant_id>/menu/new/', methods=['GET', 'POST'])
 def newMenuItem(restaurant_id):
     if 'username' not in login_session:
         return redirect('/login')
@@ -292,7 +310,7 @@ def newMenuItem(restaurant_id):
 
 
 # Edit a menu item
-@app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/edit', methods=['GET', 'POST'])
+@app.route('/restaurants/<int:restaurant_id>/menu/<int:menu_id>/edit', methods=['GET', 'POST'])
 def editMenuItem(restaurant_id, menu_id):
     if 'username' not in login_session:
         return redirect('/login')
@@ -319,7 +337,7 @@ def editMenuItem(restaurant_id, menu_id):
 
 
 # Delete a menu item
-@app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/delete',
+@app.route('/restaurants/<int:restaurant_id>/menu/<int:menu_id>/delete',
            methods=['GET', 'POST'])
 def deleteMenuItem(restaurant_id, menu_id):
     if 'username' not in login_session:
