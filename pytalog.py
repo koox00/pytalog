@@ -30,13 +30,30 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 
+def generate_csrf_token():
+    if 'state' not in login_session:
+        state = ''.join(random.choice(string.ascii_uppercase + string.digits)
+                    for x in xrange(32))
+        login_session['state'] = state
+    return login_session['state']
+
+app.jinja_env.globals['csrf_token'] = generate_csrf_token
+
+
+@app.before_request
+def csrf_protect():
+    if request.method == "POST":
+        token = login_session.pop('csrf_token', None)
+        if not token or token != request.form.get('csrf_token'):
+            abort(403)
+
+
 # Create anti-forgery state token
 @app.route('/login')
 def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
-    # return "The current session state is %s" % login_session['state']
     return render_template('login.html', STATE=state)
 
 
@@ -208,6 +225,14 @@ def menuItemJSON(restaurant_id, menu_id):
 def restaurantsJSON():
     restaurants = session.query(Restaurant).all()
     return jsonify(restaurants=[r.serialize for r in restaurants])
+
+
+# JSON APIs to view Restaurant Information
+@app.route('/restaurants/<int:id>/JSON')
+def restaurantMenuJSON(id):
+    items = session.query(Restaurant).filter_by(
+        id=id).all()
+    return jsonify(Restaurant=[i.serialize for i in items])
 
 
 # Show all restaurants

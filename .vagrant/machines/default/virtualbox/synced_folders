@@ -1,1 +1,1 @@
-{"virtualbox":{"/vagrant":{"guestpath":"/vagrant","hostpath":"/home/koox00/Code/Nanodegree/pytalog","disabled":false}}}
+{"virtualbox":{"/vagrant":{"guestpath":"/vagrant","hostpath":"/home/koox00/Code/pytalog","disabled":false,"__vagrantfile":true}}}
