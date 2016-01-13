@@ -2,7 +2,7 @@ from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
-
+import datetime
 Base = declarative_base()
 
 
@@ -32,6 +32,23 @@ class Restaurant(Base):
     name = Column(String(250), nullable=False)
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship(User)
+
+    @property
+    def url(self):
+        """Return relative url of restaurant"""
+        return "restaurants/%s/menu" %  self.id
+
+    @property
+    def rendered_text(self):
+        return "todo"
+
+    @property
+    def last_update(self):
+        return datetime.date.today()
+
+    @property
+    def published(self):
+        return datetime.date.today()
 
     @property
     def serialize(self):

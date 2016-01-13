@@ -3,6 +3,8 @@ from flask import Flask, render_template, request, redirect, jsonify, url_for, f
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Restaurant, MenuItem, User
+from urlparse import urljoin
+from werkzeug.contrib.atom import AtomFeed
 
 from flask import session as login_session
 import random
@@ -206,8 +208,42 @@ def gdisconnect():
         return response
 
 
+def make_external(url):
+    return urljoin(request.url_root, url)
+
+
+# Atom FEED Endpoints
+@app.route('/restaurants.atom')
+def recent_feed():
+    feed = AtomFeed('Recent Restaurants',
+                    feed_url=request.url, url=request.url_root)
+    restaurants = session.query(Restaurant).limit(15).all()
+    for restaurant in restaurants:
+        feed.add(restaurant.name, unicode(restaurant.rendered_text),
+                 content_type = 'html',
+                 author = getUserInfo(restaurant.user_id).name,
+                 url = make_external(restaurant.url),
+                 updated = restaurant.last_update,
+                 published = restaurant.published)
+    return feed.get_response()
+
+
 # JSON APIs to view Restaurant Information
-@app.route('/restaurants/<int:restaurant_id>/menu/JSON')
+@app.route('/restaurants.JSON')
+def restaurantsJSON():
+    restaurants = session.query(Restaurant).all()
+    return jsonify(restaurants=[r.serialize for r in restaurants])
+
+
+# JSON APIs to view Restaurant Information
+@app.route('/restaurants/<int:id>.JSON')
+def restaurantMenuJSON(id):
+    items = session.query(Restaurant).filter_by(
+        id=id).all()
+    return jsonify(Restaurant=[i.serialize for i in items])
+
+
+@app.route('/restaurants/<int:restaurant_id>/menu.JSON')
 def restaurantMenuJSON(restaurant_id):
     # restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
     items = session.query(MenuItem).filter_by(
@@ -215,24 +251,10 @@ def restaurantMenuJSON(restaurant_id):
     return jsonify(MenuItems=[i.serialize for i in items])
 
 
-@app.route('/restaurants/<int:restaurant_id>/menu/<int:menu_id>/JSON')
+@app.route('/restaurants/<int:restaurant_id>/menu/<int:menu_id>.JSON')
 def menuItemJSON(restaurant_id, menu_id):
     Menu_Item = session.query(MenuItem).filter_by(id=menu_id).one()
     return jsonify(Menu_Item=Menu_Item.serialize)
-
-
-@app.route('/restaurants/JSON')
-def restaurantsJSON():
-    restaurants = session.query(Restaurant).all()
-    return jsonify(restaurants=[r.serialize for r in restaurants])
-
-
-# JSON APIs to view Restaurant Information
-@app.route('/restaurants/<int:id>/JSON')
-def restaurantMenuJSON(id):
-    items = session.query(Restaurant).filter_by(
-        id=id).all()
-    return jsonify(Restaurant=[i.serialize for i in items])
 
 
 # Show all restaurants
