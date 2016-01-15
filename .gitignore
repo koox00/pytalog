@@ -57,8 +57,7 @@ docs/_build/
 target/
 
 # Vagrant box
-.vagrant
+.vagrant/
 
 # Secret Keys
-client_secrets.json
 client_secrets.json
