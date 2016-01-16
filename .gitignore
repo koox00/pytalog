@@ -61,3 +61,5 @@ target/
 
 # Secret Keys
 client_secrets.json
+
+restaurantmenuwithusers.db
