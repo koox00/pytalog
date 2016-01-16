@@ -1,6 +1,6 @@
 from flask import (Flask, render_template, request, redirect,
                    jsonify, url_for, flash, make_response,
-                   session as login_session)
+                   session as login_session, abort)
 
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
@@ -31,6 +31,7 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 
+# Generate csrf token
 def generate_csrf_token():
     if 'state' not in login_session:
         state = ''.join(random.choice(string.ascii_uppercase + string.digits)
@@ -38,24 +39,41 @@ def generate_csrf_token():
         login_session['state'] = state
     return login_session['state']
 
+# Make csrf_token() function global for the views
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
 
 
+# Check every POST for the csrf token
 @app.before_request
 def csrf_protect():
     if request.method == "POST":
-        token = login_session.pop('csrf_token', None)
+        token = login_session.pop('state', None)
         if not token or token != request.form.get('csrf_token'):
             abort(403)
 
 
-# Create anti-forgery state token
+# Error Page Handlers
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+
+@app.errorhandler(403)
+def forbbiden(e):
+    response = make_response(
+        json.dumps("This request is forbidden on this server."), 403)
+    response.headers['Content-Type'] = 'application/json'
+    return response
+
+
+@app.errorhandler(500)
+def page_not_found(e):
+    return render_template('500.html'), 500
+
+
 @app.route('/login')
 def showLogin():
-    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
-                    for x in xrange(32))
-    login_session['state'] = state
-    return render_template('login.html', STATE=state)
+    return render_template('login.html')
 
 
 @app.route('/gconnect', methods=['POST'])
@@ -322,7 +340,8 @@ def deleteRestaurant(restaurant_id):
 @app.route('/restaurants/<int:restaurant_id>/menu/')
 def showMenu(restaurant_id):
     restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
-    items = session.query(MenuItem).filter_by(restaurant_id=restaurant_id).all()
+    items = session.query(MenuItem).filter_by(
+                                    restaurant_id=restaurant_id).all()
     creator = getUserInfo(restaurant.user_id)
 
     if 'username' not in login_session or creator.id != login_session['user_id']:
