@@ -1,5 +1,6 @@
 from flask import (Flask, render_template, request, redirect,
-                   jsonify, url_for, flash)
+                   jsonify, url_for, flash, make_response,
+                   session as login_session)
 
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
@@ -7,15 +8,12 @@ from database_setup import Base, Restaurant, MenuItem, User
 from urlparse import urljoin
 from werkzeug.contrib.atom import AtomFeed
 
-from flask import session as login_session
 import random
 import string
 
-from oauth2client.client import flow_from_clientsecrets
-from oauth2client.client import FlowExchangeError
+from oauth2client.client import (flow_from_clientsecrets, FlowExchangeError)
 import httplib2
 import json
-from flask import make_response
 import requests
 
 app = Flask(__name__)
@@ -288,8 +286,7 @@ def newRestaurant():
 # Edit a restaurant
 @app.route('/restaurants/<int:restaurant_id>/edit/', methods=['GET', 'POST'])
 def editRestaurant(restaurant_id):
-    editedRestaurant = session.query(Restaurant)
-    .filter_by(id=restaurant_id).one()
+    editedRestaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
     if 'username' not in login_session:
         return redirect('/login')
     if request.method == 'POST':
@@ -325,12 +322,10 @@ def deleteRestaurant(restaurant_id):
 @app.route('/restaurants/<int:restaurant_id>/menu/')
 def showMenu(restaurant_id):
     restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
-    items = session.query(MenuItem)
-    .filter_by(restaurant_id=restaurant_id).all()
+    items = session.query(MenuItem).filter_by(restaurant_id=restaurant_id).all()
     creator = getUserInfo(restaurant.user_id)
 
-    if 'username' not in login_session
-    or creator.id != login_session['user_id']:
+    if 'username' not in login_session or creator.id != login_session['user_id']:
         return render_template('publicmenu.html',
                                items=items,
                                restaurant=restaurant,
