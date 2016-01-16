@@ -18,8 +18,10 @@ import requests
 
 app = Flask(__name__)
 
+# Google oauth api credentials
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
+
 APPLICATION_NAME = "Restaurant Menu Application"
 
 
@@ -159,7 +161,7 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' "style="width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
@@ -424,6 +426,6 @@ def deleteMenuItem(restaurant_id, menu_id):
 
 
 if __name__ == '__main__':
-    app.secret_key = 'super_secret_key'
+    app.secret_key = 'b\'\xf4\x93v\xab~0n-#"\x19\x19Dy\xca\x14\xb3\x82`\xb6\xce\x11b"'
     app.debug = True
     app.run(host='0.0.0.0', port=5000)
