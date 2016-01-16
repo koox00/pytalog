@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Restaurant, MenuItem, User
 from urlparse import urljoin
 from werkzeug.contrib.atom import AtomFeed
-
+from flask_debugtoolbar import DebugToolbarExtension
 import random
 import string
 
@@ -17,6 +17,9 @@ import json
 import requests
 
 app = Flask(__name__)
+
+app.secret_key = 'b\'\xf4\x93v\xab~0n-#"\x19\x19Dy\xca\x14\xb3\x82`\xb6\xce\x11b"'
+app.debug = True
 
 # Google oauth api credentials
 CLIENT_ID = json.loads(
@@ -31,6 +34,9 @@ Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+# enable debugtoolbar
+toolbar = DebugToolbarExtension(app)
 
 
 # Generate csrf token
@@ -426,6 +432,4 @@ def deleteMenuItem(restaurant_id, menu_id):
 
 
 if __name__ == '__main__':
-    app.secret_key = 'b\'\xf4\x93v\xab~0n-#"\x19\x19Dy\xca\x14\xb3\x82`\xb6\xce\x11b"'
-    app.debug = True
     app.run(host='0.0.0.0', port=5000)
