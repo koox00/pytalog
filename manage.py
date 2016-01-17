@@ -16,7 +16,7 @@ def initdb():
 @manager.command
 def seeddb():
     seed()
-    print 'Initialized the database'
+    print 'Seed the database with data'
 
 
 @manager.command
