@@ -12,21 +12,22 @@ If you don't have vagrant you have to manually install all the requirements list
 
 Once installed you can run the following commands:
 
+create the db and all the tables
+
     python manage.py initdb
 
-creates the db and all the tables
+seed the db with dummy data
 
     python manage.py seeddb
 
-seeds the db with dummy data
+drop the database
 
     python manage.py dropdb
 
-drops the database
+start a server. Once run you can access the application in `0.0.0.0:5000`
 
     python manage.py runserver
 
-runs a server. Once run you can access the application in `0.0.0.0:5000`
 
 
 # TODO
