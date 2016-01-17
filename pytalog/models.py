@@ -40,8 +40,20 @@ class Restaurant(db.Model):
         return "restaurants/%s/menu" % self.id
 
     @property
-    def rendered_text(self):
-        return "todo"
+    def menu_items_str(self):
+        items = MenuItem.query.filter_by(
+            restaurant_id=self.id).order_by(MenuItem.updated_at.desc()).limit(10)
+        return ', '.join([x.name for x in items])
+
+    @property
+    def menu_items_html(self):
+        items = MenuItem.query.filter_by(
+            restaurant_id=self.id).order_by(MenuItem.updated_at.desc()).limit(10)
+        output = "<ul>"
+        for item in items:
+            output += "<li>%s</li>" % item.name
+        output += "</ul>"
+        return output
 
     @property
     def last_update(self):
@@ -61,14 +73,10 @@ class Restaurant(db.Model):
             'id': self.id,
         }
 
-    # Model staicmethods (don't work for now)
-    @staticmethod
-    def getUserInfo(self):
-        return db.User.query.filter_by(id=self.user_id).one()
-
+    # Model staicmethods
     @staticmethod
     def newest(num):
-        return db.Restaurant.query.order_by(desc(Restaurant.created_at)).limit(num)
+        return Restaurant.query.order_by(Restaurant.updated_at.desc()).limit(num)
 
 
 class MenuItem(db.Model):
@@ -85,6 +93,7 @@ class MenuItem(db.Model):
     updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
     restaurant = db.relationship(Restaurant)
     user = db.relationship(User)
+
 
     @property
     def last_update(self):

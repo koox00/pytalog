@@ -1,7 +1,10 @@
 from pytalog import app, db
-from flask.ext.script import Manager, prompt_bool
+from flask.ext.script import Manager, Server, prompt_bool
 from pytalog.seed_db import seed
+
 manager = Manager(app)
+server = Server(host="0.0.0.0", port=5000)
+manager.add_command("runserver", server)
 
 
 @manager.command
