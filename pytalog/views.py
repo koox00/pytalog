@@ -37,7 +37,9 @@ app.jinja_env.globals['csrf_token'] = generate_csrf_token
 def csrf_protect():
     if request.method == "POST":
         token = login_session.pop('state', None)
-        if not token or token != request.form.get('csrf_token'):
+        if not token or \
+            (token != request.form.get('csrf_token') and
+             token != request.args.get('state')):
             abort(403)
 
 
@@ -67,11 +69,6 @@ def showLogin():
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
-    # Validate state token
-    if request.args.get('state') != login_session['state']:
-        response = make_response(json.dumps('Invalid state parameter.'), 401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
     # Obtain authorization code
     code = request.data
 
@@ -271,7 +268,7 @@ def menuItemJSON(restaurant_id, menu_id):
 @app.route('/')
 @app.route('/restaurants/')
 def showRestaurants():
-    restaurants = db.session.query(Restaurant).order_by(asc(Restaurant.name))
+    restaurants = db.session.query(Restaurant).order_by(Restaurant.name)
     if 'username' not in login_session:
         return render_template('publicrestaurants.html',
                                restaurants=restaurants)

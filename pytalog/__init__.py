@@ -8,7 +8,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 APPLICATION_NAME = "Restaurant Menu Application"
-UPLOAD_FOLDER = '/uploads'
+UPLOAD_FOLDER = os.path.join(basedir, 'uploads')
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 # Create my Flask app
@@ -21,10 +21,13 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # Connect to Database and create database session
 app.config['SQLALCHEMY_DATABASE_URI'] = \
     'sqlite:////' + os.path.join(basedir, 'restaurantmenuwithusers.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db = SQLAlchemy(app)
 
 # enable debugtoolbar
 toolbar = DebugToolbarExtension(app)
+
 
 import models
 import views

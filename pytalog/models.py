@@ -28,7 +28,7 @@ class Restaurant(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(250), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     image = db.Column(db.String(250), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
@@ -79,11 +79,11 @@ class MenuItem(db.Model):
     price = db.Column(db.String(8))
     course = db.Column(db.String(250))
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     image = db.Column(db.String(250), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
     restaurant = db.relationship(Restaurant)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship(User)
 
     @property

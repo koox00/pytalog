@@ -9,6 +9,7 @@ def initdb():
     db.create_all()
     print 'Initialized the database'
 
+
 @manager.command
 def seeddb():
     seed()
