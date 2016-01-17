@@ -1,11 +1,12 @@
 from flask import (Flask, render_template, request, redirect,
                    jsonify, url_for, flash, make_response,
-                   session as login_session, abort)
+                   session as login_session, abort, send_from_directory)
 
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Restaurant, MenuItem, User
 from urlparse import urljoin
+from werkzeug import secure_filename
 from werkzeug.contrib.atom import AtomFeed
 from flask_debugtoolbar import DebugToolbarExtension
 import random
@@ -16,22 +17,25 @@ import httplib2
 import json
 import requests
 
-app = Flask(__name__)
-
-app.secret_key = 'b\'\xf4\x93v\xab~0n-#"\x19\x19Dy\xca\x14\xb3\x82`\xb6\xce\x11b"'
-app.debug = True
-
 # Google oauth api credentials
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
 
 APPLICATION_NAME = "Restaurant Menu Application"
+UPLOAD_FOLDER = '/uploads'
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+
+# Create my Flask app
+app = Flask(__name__)
+
+app.secret_key = 'b\'\xf4\x93v\xab~0n-#"\x19\x19Dy\xca\x14\xb3\x82`\xb6\xce\x11b"'
+app.debug = True
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 # Connect to Database and create database session
 engine = create_engine('sqlite:///restaurantmenuwithusers.db')
 Base.metadata.bind = engine
-
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
@@ -261,7 +265,7 @@ def restaurantsJSON():
 
 # JSON APIs to view Restaurant Information
 @app.route('/restaurants/<int:id>.JSON')
-def restaurantMenuJSON(id):
+def restaurantJSON(id):
     items = session.query(Restaurant).filter_by(
         id=id).all()
     return jsonify(Restaurant=[i.serialize for i in items])
@@ -429,6 +433,26 @@ def deleteMenuItem(restaurant_id, menu_id):
         return redirect(url_for('showMenu', restaurant_id=restaurant_id))
     else:
         return render_template('deleteMenuItem.html', item=itemToDelete)
+
+
+# Route serving uploaded files
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'],
+                               filename)
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+
+def upload_file(file):
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return filename
+    return False
 
 
 if __name__ == '__main__':
