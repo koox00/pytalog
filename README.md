@@ -24,11 +24,11 @@ drop the database
 
     python manage.py dropdb
 
-start a server. Once run you can access the application in `0.0.0.0:5000`
+start a server.
 
     python manage.py runserver
 
-
+Once the server is run you can access the application in `0.0.0.0:5000`.
 
 # TODO
 
