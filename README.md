@@ -38,3 +38,4 @@ Once the server is run you can access the application in `0.0.0.0:5000`.
   - auth (login, logout, and providers)
   - main
 - create tests
+- create a seperate file for config
