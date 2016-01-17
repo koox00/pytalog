@@ -10,6 +10,8 @@ If you have vagrant installed just cd in the project directory and run vagrant u
 
 If you don't have vagrant you have to manually install all the requirements listed in the requirements.txt
 
+e.g: `pip install --user Flask-SQLAlchemy`
+
 Once installed you can run the following commands:
 
 create the db and all the tables
