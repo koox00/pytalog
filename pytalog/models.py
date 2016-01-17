@@ -1,18 +1,13 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
-from sqlalchemy import create_engine
 from datetime import datetime
-Base = declarative_base()
+from pytalog import db
 
 
-class User(Base):
-    __tablename__ = 'users'
+class User(db.Model):
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
-    email = Column(String(250), nullable=False)
-    picture = Column(String(250))
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(250), nullable=False)
+    email = db.Column(db.String(250), nullable=False)
+    picture = db.Column(db.String(250))
 
     @property
     def serialize(self):
@@ -29,16 +24,15 @@ class User(Base):
                 self.name, self.email, self.picture)
 
 
-class Restaurant(Base):
-    __tablename__ = 'restaurant'
+class Restaurant(db.Model):
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    image = Column(String(250), nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, nullable=True, onupdate=datetime.utcnow)
-    user = relationship(User)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(250), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    image = db.Column(db.String(250), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
+    user = db.relationship(User)
 
     @property
     def url(self):
@@ -70,28 +64,27 @@ class Restaurant(Base):
     # Model staicmethods (don't work for now)
     @staticmethod
     def getUserInfo(self):
-        return User.query.filter_by(id=self.user_id).one()
+        return db.User.query.filter_by(id=self.user_id).one()
 
     @staticmethod
     def newest(num):
-        return Restaurant.query.order_by(desc(Restaurant.created_at)).limit(num)
+        return db.Restaurant.query.order_by(desc(Restaurant.created_at)).limit(num)
 
 
-class MenuItem(Base):
-    __tablename__ = 'menu_item'
+class MenuItem(db.Model):
 
-    name = Column(String(80), nullable=False)
-    id = Column(Integer, primary_key=True)
-    description = Column(String(250))
-    price = Column(String(8))
-    course = Column(String(250))
-    restaurant_id = Column(Integer, ForeignKey('restaurant.id'))
-    image = Column(String(250), nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, nullable=True, onupdate=datetime.utcnow)
-    restaurant = relationship(Restaurant)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    user = relationship(User)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), nullable=False)
+    description = db.Column(db.String(250))
+    price = db.Column(db.String(8))
+    course = db.Column(db.String(250))
+    restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'))
+    image = db.Column(db.String(250), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
+    restaurant = db.relationship(Restaurant)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user = db.relationship(User)
 
     @property
     def last_update(self):
@@ -113,7 +106,3 @@ class MenuItem(Base):
             'price': self.price,
             'course': self.course,
         }
-
-
-engine = create_engine('sqlite:///restaurantmenuwithusers.db')
-Base.metadata.create_all(engine)

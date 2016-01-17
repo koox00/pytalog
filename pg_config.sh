@@ -9,3 +9,5 @@ pip install oauth2client
 pip install requests
 pip install httplib2
 pip install flask-debugtoolbar
+pip install Flask-SQLAlchemy
+pip install Flask-Script
