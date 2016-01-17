@@ -21,6 +21,7 @@ CLIENT_ID = json.loads(
 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
+
 # Generate csrf token
 def generate_csrf_token():
     if 'state' not in login_session:
@@ -33,7 +34,7 @@ def generate_csrf_token():
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
 
 
-# Check every POST for the csrf token
+# Check before every POST for the csrf token
 @app.before_request
 def csrf_protect():
     if request.method == "POST":
