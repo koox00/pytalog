@@ -47,6 +47,9 @@
       <h3>{{i.name}}</h3>
       <p>{{i.description}}</p>
       <p class="menu-price">{{i.price}}</p>
+      {% if i.filename %}
+      <img src='{{url_for('uploaded_file', filename=i.image ) }}'>
+      {% endif %}
 
     </div>
     {% endif %}
@@ -60,6 +63,9 @@
       <h3>{{i.name}}</h3>
       <p>{{i.description}}</p>
       <p class="menu-price">{{i.price}}</p>
+      {% if i.filename %}
+      <img src='{{url_for('uploaded_file', filename=i.image ) }}'>
+      {% endif %}
 
     </div>
     {% endif %}
@@ -73,6 +79,9 @@
       <h3>{{i.name}}</h3>
       <p>{{i.description}}</p>
       <p class="menu-price">{{i.price}}</p>
+      {% if i.filename %}
+      <img src='{{url_for('uploaded_file', filename=i.image ) }}'>
+      {% endif %}
 
     </div>
     {% endif %}
@@ -84,6 +93,9 @@
       <h3>{{i.name}}</h3>
       <p>{{i.description}}</p>
       <p class="menu-price">{{i.price}}</p>
+      {% if i.filename %}
+      <img src='{{url_for('uploaded_file', filename=i.image ) }}'>
+      {% endif %}
 
     </div>
     {% endif %}
