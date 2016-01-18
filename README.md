@@ -10,25 +10,25 @@ If you have vagrant installed just cd in the project directory and run vagrant u
 
 If you don't have vagrant you have to manually install all the requirements listed in the requirements.txt
 
-e.g: `pip install --user Flask-SQLAlchemy`
+e.g: `$ pip install --user Flask-SQLAlchemy`
 
 Once installed you can run the following commands:
 
 create the db and all the tables
 
-    python manage.py initdb
+    $ python manage.py initdb
 
 seed the db with dummy data
 
-    python manage.py seeddb
+    $ python manage.py seeddb
 
 drop the database
 
-    python manage.py dropdb
+    $ python manage.py dropdb
 
 start a server.
 
-    python manage.py runserver
+    $ python manage.py runserver
 
 Once the server is run you can access the application in `0.0.0.0:5000`.
 
@@ -36,7 +36,7 @@ Once the server is run you can access the application in `0.0.0.0:5000`.
 
 For the google login you have to add your credentials. First rename the example file.
 
-    mv client_secrets.example.json client_secrets.json
+    $ mv client_secrets.example.json client_secrets.json
 
 Then add your api username and secret
 
