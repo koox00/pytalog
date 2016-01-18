@@ -180,12 +180,8 @@ def createUser(login_session):
     return user.id
 
 
-def getUserInfo(user_id):
-    user = User.query.filter_by(id=user_id).one()
-    return user
-
-
 def getUserID(email):
+    """Return user's id by email"""
     try:
         user = User.query.filter_by(email=email).one()
         return user.id
@@ -241,7 +237,7 @@ def restaurant_feed():
     for restaurant in restaurants:
         feed.add(restaurant.name, unicode(restaurant.menu_items_str),
                  content_type='html',
-                 author=getUserInfo(restaurant.user_id).name,
+                 author=restaurant.user.name,
                  url=make_external(restaurant.url),
                  updated=restaurant.last_update,
                  published=restaurant.published)
@@ -342,7 +338,7 @@ def showMenu(restaurant_id):
     restaurant = Restaurant.query.filter_by(id=restaurant_id).first_or_404()
     items = MenuItem.query.filter_by(
                                     restaurant_id=restaurant_id).all()
-    creator = getUserInfo(restaurant.user_id)
+    creator = restaurant.user
 
     if 'username' not in login_session or creator.id != login_session['user_id']:
         return render_template('publicmenu.html',

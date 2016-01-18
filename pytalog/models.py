@@ -3,6 +3,7 @@ from pytalog import db
 
 
 class User(db.Model):
+    __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(250), nullable=False)
@@ -25,6 +26,7 @@ class User(db.Model):
 
 
 class Restaurant(db.Model):
+    __tablename__ = 'restaurant'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(250), nullable=False)
@@ -32,7 +34,7 @@ class Restaurant(db.Model):
     image = db.Column(db.String(250), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
-    user = db.relationship(User)
+    user = db.relationship(User, backref=db.backref('restaurant', lazy='dynamic'))
 
     @property
     def url(self):
@@ -80,6 +82,7 @@ class Restaurant(db.Model):
 
 
 class MenuItem(db.Model):
+    __tablename__ = 'menu_item'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
@@ -91,9 +94,9 @@ class MenuItem(db.Model):
     image = db.Column(db.String(250), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
-    restaurant = db.relationship(Restaurant)
-    user = db.relationship(User)
-
+    restaurant = db.relationship(Restaurant,
+                                 backref=db.backref('menu_item', lazy='dynamic'))
+    user = db.relationship(User, backref=db.backref('menu_item', lazy='dynamic'))
 
     @property
     def last_update(self):
