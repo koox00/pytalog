@@ -305,6 +305,9 @@ def newRestaurant():
 @login_required
 def editRestaurant(restaurant_id):
     editedRestaurant = Restaurant.query.filter_by(id=restaurant_id).first_or_404()
+    if not checkOwnership(editedRestaurant):
+        return redirect(url_for('showRestaurants'))
+
     if request.method == 'POST':
         if request.form['name']:
             editedRestaurant.name = request.form['name']
@@ -320,12 +323,14 @@ def editRestaurant(restaurant_id):
 @login_required
 def deleteRestaurant(restaurant_id):
     restaurantToDelete = Restaurant.query.filter_by(id=restaurant_id).first_or_404()
+    if not checkOwnership(restaurantToDelete):
+        return redirect(url_for('showRestaurants', restaurant_id=restaurant_id))
+
     if request.method == 'POST':
         db.session.delete(restaurantToDelete)
         flash('%s Successfully Deleted' % restaurantToDelete.name)
         db.session.commit()
-        return redirect(url_for('showRestaurants',
-                        restaurant_id=restaurant_id))
+        return redirect(url_for('showRestaurants'))
     else:
         return render_template('deleteRestaurant.html',
                                restaurant=restaurantToDelete)
@@ -358,6 +363,9 @@ def showMenu(restaurant_id):
 @login_required
 def newMenuItem(restaurant_id):
     restaurant = Restaurant.query.filter_by(id=restaurant_id).one()
+    if not checkOwnership(restaurant):
+        return redirect(url_for('showMenu', restaurant_id=restaurant_id))
+
     if request.method == 'POST':
         newItem = MenuItem(name=request.form['name'],
                            description=request.form['description'],
@@ -379,6 +387,8 @@ def newMenuItem(restaurant_id):
 @login_required
 def editMenuItem(restaurant_id, menu_id):
     editedItem = MenuItem.query.filter_by(id=menu_id).one()
+    if not checkOwnership(editedItem):
+        return redirect(url_for('showMenu', restaurant_id=restaurant_id))
     restaurant = Restaurant.query.filter_by(id=restaurant_id).one()
     if request.method == 'POST':
         if request.form['name']:
@@ -410,6 +420,9 @@ def editMenuItem(restaurant_id, menu_id):
 @login_required
 def deleteMenuItem(restaurant_id, menu_id):
     restaurant = Restaurant.query.filter_by(id=restaurant_id).one()
+    if not checkOwnership(restaurant):
+        return redirect(url_for('showMenu', restaurant_id=restaurant_id))
+
     itemToDelete = MenuItem.query.filter_by(id=menu_id).one()
     if request.method == 'POST':
         db.session.delete(itemToDelete)
@@ -442,3 +455,7 @@ def upload_file(file):
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         return filename
     return False
+
+
+def checkOwnership(model):
+    return login_session['user_id'] == model.user.id
