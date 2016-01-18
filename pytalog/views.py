@@ -4,6 +4,7 @@ import string
 import httplib2
 import json
 import requests
+from functools import wraps
 
 from flask import (render_template, request, redirect,
                    jsonify, url_for, flash, make_response,
@@ -34,9 +35,8 @@ def generate_csrf_token():
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
 
 
-
 def login_required(f):
-    """Decorator function, for routes that need auth"""
+    """Decorator function for authenticated routes"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'username' not in login_session:
