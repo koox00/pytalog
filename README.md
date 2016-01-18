@@ -32,6 +32,15 @@ start a server.
 
 Once the server is run you can access the application in `0.0.0.0:5000`.
 
+## Google oauth API
+
+For the google login you have to add your credentials. First rename the example file.
+
+ mv client_secrets.example.json client_secrets.json
+
+Then add your api username and secret
+
+
 # TODO
 
 - implement a file logger
