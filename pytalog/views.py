@@ -34,6 +34,17 @@ def generate_csrf_token():
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
 
 
+
+def login_required(f):
+    """Decorator function, for routes that need auth"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in login_session:
+            return redirect(url_for('login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 # Check before every POST for the csrf token
 @app.before_request
 def csrf_protect():
@@ -280,9 +291,8 @@ def showRestaurants():
 
 # Create a new restaurant
 @app.route('/restaurants/new/', methods=['GET', 'POST'])
+@login_required
 def newRestaurant():
-    if 'username' not in login_session:
-        return redirect('/login')
     if request.method == 'POST':
         newRestaurant = Restaurant(
             name=request.form['name'], user_id=login_session['user_id'])
@@ -296,10 +306,9 @@ def newRestaurant():
 
 # Edit a restaurant
 @app.route('/restaurants/<int:restaurant_id>/edit/', methods=['GET', 'POST'])
+@login_required
 def editRestaurant(restaurant_id):
     editedRestaurant = Restaurant.query.filter_by(id=restaurant_id).first_or_404()
-    if 'username' not in login_session:
-        return redirect('/login')
     if request.method == 'POST':
         if request.form['name']:
             editedRestaurant.name = request.form['name']
@@ -312,9 +321,8 @@ def editRestaurant(restaurant_id):
 
 # Delete a restaurant
 @app.route('/restaurants/<int:restaurant_id>/delete/', methods=['GET', 'POST'])
+@login_required
 def deleteRestaurant(restaurant_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     restaurantToDelete = Restaurant.query.filter_by(id=restaurant_id).first_or_404()
     if request.method == 'POST':
         db.session.delete(restaurantToDelete)
@@ -351,9 +359,8 @@ def showMenu(restaurant_id):
 # Create a new menu item
 @app.route('/restaurants/<int:restaurant_id>/menu/new/',
            methods=['GET', 'POST'])
+@login_required
 def newMenuItem(restaurant_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     restaurant = Restaurant.query.filter_by(id=restaurant_id).one()
     if request.method == 'POST':
         newItem = MenuItem(name=request.form['name'],
@@ -373,9 +380,8 @@ def newMenuItem(restaurant_id):
 # Edit a menu item
 @app.route('/restaurants/<int:restaurant_id>/menu/<int:menu_id>/edit',
            methods=['GET', 'POST'])
+@login_required
 def editMenuItem(restaurant_id, menu_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     editedItem = MenuItem.query.filter_by(id=menu_id).one()
     restaurant = Restaurant.query.filter_by(id=restaurant_id).one()
     if request.method == 'POST':
@@ -405,9 +411,8 @@ def editMenuItem(restaurant_id, menu_id):
 # Delete a menu item
 @app.route('/restaurants/<int:restaurant_id>/menu/<int:menu_id>/delete',
            methods=['GET', 'POST'])
+@login_required
 def deleteMenuItem(restaurant_id, menu_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     restaurant = Restaurant.query.filter_by(id=restaurant_id).one()
     itemToDelete = MenuItem.query.filter_by(id=menu_id).one()
     if request.method == 'POST':
