@@ -25,6 +25,7 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 # Generate csrf token
 def generate_csrf_token():
+    """Generates a random string used to be used as a csrf protection token"""
     if 'state' not in login_session:
         state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                         for x in xrange(32))
@@ -45,9 +46,9 @@ def login_required(f):
     return decorated_function
 
 
-# Check before every POST for the csrf token
 @app.before_request
 def csrf_protect():
+    """Check before every POST for the csrf token"""
     if request.method == "POST":
         token = login_session.pop('state', None)
         if not token or \
@@ -438,18 +439,30 @@ def deleteMenuItem(restaurant_id, menu_id):
 # Route serving uploaded files
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
+    """Serves an image to the view
+
+    Usage:
+        url_for('uploaded_file', filename=filename)
+    """
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
 
 
-# check if file ext is allowed
 def allowed_file(filename):
+    """Checks if filename's extension is allowed for upload"""
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 
-# Upload file
 def upload_file(file):
+    """Uploads a file to the direcory set in the app config
+
+    Args:
+        file object
+    Returns:
+        on success the filename
+        on failure False
+    """
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -458,4 +471,11 @@ def upload_file(file):
 
 
 def checkOwnership(model):
+    """Returns whether the user logged in is the creator of the item
+
+    Args:
+        sqlAlchemy Object with backref to user
+    Return:
+        boolean
+    """
     return login_session['user_id'] == model.user.id
