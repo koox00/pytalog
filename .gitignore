@@ -64,17 +64,12 @@ client_secrets.json
 
 restaurantmenuwithusers.db
 
-<<<<<<< HEAD
 # Vim
 =======
->>>>>>> dev
 [._]*.s[a-w][a-z]
 [._]s[a-w][a-z]
 *.un~
 Session.vim
 .netrwhist
 *~
-<<<<<<< HEAD
-=======
 pytalog/uploads/*.jpg
->>>>>>> dev
