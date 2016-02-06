@@ -7,3 +7,4 @@ httplib2
 flask-debugtoolbar
 Flask-SQLAlchemy
 Flask-Script
+psyconpg2
