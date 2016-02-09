@@ -19,8 +19,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 # Connect to Database and create database session
-app.config['SQLALCHEMY_DATABASE_URI'] = \
-    'sqlite:////' + os.path.join(basedir, 'restaurantmenuwithusers.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://vagrant:vagrant@localhost/catalog'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # To disable the debugbar's interception

@@ -11,3 +11,8 @@ pip install httplib2
 pip install flask-debugtoolbar
 pip install Flask-SQLAlchemy
 pip install Flask-Script
+
+su postgres -c 'createuser -dRS vagrant'
+su vagrant -c 'createdb'
+su vagrant -c 'createdb catalog'
+
