@@ -8,16 +8,13 @@ With JSON endpoints and atom feeds for restaurants
 
 If you have vagrant installed just cd in the project directory and run vagrant up.
 
-If you don't have vagrant you have to manually install all the requirements listed in the requirements.txt
+If you don't have vagrant you have to manually run the `pg_config.sh`.
 
-e.g: 
+To setup for development:
 
-    $ pip install --user Flask-SQLAlchemy
-or all at once
+    $ python setup.py develop
 
-    $ pip install -r requirements.txt
-
-Once installed you can run the following commands:
+Once setup you can run the following commands:
 
 create the db and all the tables
 
@@ -41,7 +38,7 @@ Once the server is run you can access the application in `0.0.0.0:5000`.
 
 For the google login you have to add your credentials. First rename the example file.
 
-    $ mv client_secrets.example.json client_secrets.json
+    $ mv pytalog/client_secrets.example.json pytalog/client_secrets.json
 
 Then add your api username and secret
 
@@ -54,4 +51,4 @@ Then add your api username and secret
   - auth (login, logout, and providers)
   - main
 - create tests
-- create a seperate file for config
+<del>- create a seperate file for config</del>
