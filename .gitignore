@@ -1,7 +1,7 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-production.py
+production_config.py
 prod_config.sh
 # C extensions
 *.so

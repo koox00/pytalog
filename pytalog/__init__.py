@@ -5,7 +5,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 # Create my Flask app
 app = Flask(__name__)
-app.config.from_object('development')
+app.config.from_object('development_config')
 
 db = SQLAlchemy(app)
 
