@@ -1,0 +1,3 @@
+recursive-include pytalog/templates *
+recursive-include pytalog/static *
+recursive-include pytalog/uploads *

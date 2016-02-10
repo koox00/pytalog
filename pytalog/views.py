@@ -17,8 +17,14 @@ from werkzeug import secure_filename
 from werkzeug.contrib.atom import AtomFeed
 from oauth2client.client import (flow_from_clientsecrets, FlowExchangeError)
 # Google oauth api credentials
+
+# Base directory
+_basedir = os.path.abspath(os.path.dirname(__file__))
+
+SECRETS_PATH = os.path.join(_basedir, 'client_secrets.json')
+
 CLIENT_ID = json.loads(
-    open('client_secrets.json', 'r').read())['web']['client_id']
+    open(SECRETS_PATH, 'r').read())['web']['client_id']
 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
