@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='Pytalog',
+    name='pytalog',
     version='1.0',
     long_description=__doc__,
     packages=['pytalog'],
